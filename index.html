@@ -35,7 +35,8 @@
         <h3>Total cost: R{{ calculateTotal() }}</h3>
         <p>{{ message }}</p>
         <div class="payment-amount">
-            Payment amount: R{{ paymentAmount() }}
+            <h3>Payment amount: R{{ paymentAmount() }}</h3>
+            
         </div>
     
         <button class="button-size" @click="checkout()"><b>Pay</b></button>
