@@ -8,8 +8,8 @@
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.8.0/dist/alpine.min.js" defer></script>
 </head>
-<body>
-    <h1 class="h1">Perfect Pizza</h1>
+<body x-data="cartComponent()">
+    <h1 class="h1">Perfect Pizza Cart</h1>
 
     <div class="pizzas">
 
@@ -94,7 +94,7 @@
 
     </div>
     
-    
+    <script src="cartComponent.js"></script>
 </body>
 </html>
 </body>
