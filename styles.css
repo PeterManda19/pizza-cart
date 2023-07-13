@@ -110,3 +110,17 @@ body{
     display: flex;
     flex-wrap: wrap;
 }
+
+.shopping-cart{
+    background-color: yellow;
+    text-align: center;
+}
+
+.display {
+    display: inline-block;
+}
+
+.button-size{
+    font-size: 20px;
+    padding: 10px 40px;
+}

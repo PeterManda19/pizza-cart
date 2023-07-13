@@ -40,7 +40,7 @@ function cartComponent() {
     // Checkout function
     checkout: function () {
       // Logic for the checkout process
-      //Displaying a confirmation message
+      // Displaying a confirmation message
       alert("Payment successful! Thank you for your order!");
     },
   };
