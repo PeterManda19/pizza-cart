@@ -6,110 +6,84 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Perfect Pizza Cart</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.8.0/dist/alpine.min.js" defer></script>
 </head>
-<body x-data="cartComponent()">
+<body>
     <h1 class="h1">Perfect Pizza</h1>
 
-    <div class="shopping-cart">
+    <div class="shopping-cart" x-data="cartComponent()">
         <h2>Shopping Cart</h2>
-        <div>
-            <h3 class="display">Small</h3>
-            <button @click="addToCart('Small Pizza')" class="add-button">+</button>
-            <button @click="removeFromCart('Small Pizza')" class="remove-button">-</button>
-            <span class="cost">R47.90</span>
-        </div>
-        <div>
-            <h3 class="display">Medium</h3>
-            <button @click="addToCart('Medium Pizza')" class="add-button">+</button>
-            <button @click="removeFromCart('Medium Pizza')" class="remove-button">-</button>
-            <span class="cost">R79.90</span>
-        </div>
-        <div>
-            <h3 class="display">Large</h3>
-            <button @click="addToCart('Large Pizza')" class="add-button">+</button>
-            <button @click="removeFromCart('Large Pizza')" class="remove-button">-</button>
-            <span class="cost">R114.90</span>
-        </div>
-
-        <h3>Total cost: R{{ calculateTotal() }}</h3>
-        <p>{{ message }}</p>
-        <div class="payment-amount">
+        <template x-if="cart.length === 0">
+            <p>Your cart is empty.</p>
+        </template>
+        <template x-for="(pizza, index) in cart" :key="index">
+            <div>
+                <h3 class="display">{{ pizza.name }}</h3>
+                <button @click="addToCart(pizza)" class="add-button">+</button>
+                <button @click="removeFromCart(index)" class="remove-button">-</button>
+                <span class="cost">R{{ pizza.price.toFixed(2) }}</span>
+            </div>
+        </template>
+        
+        <h3 x-show="cart.length > 0">Total cost: R{{ calculateTotal() }}</h3>
+        <p x-text="message"></p>
+        <div class="payment-amount" x-show="cart.length > 0">
             <h3>Payment amount: R{{ paymentAmount() }}</h3>
-            
         </div>
     
-        <button class="button-size" @click="checkout()"><b>Pay</b></button>
+        <button class="button-size" @click="checkout()" x-show="cart.length > 0"><b>Pay</b></button>
     </div>    
 
     <div class="pizzas">
-
         <div class="pizza small-pizza">
-            
-            <img src="pizza1.png" alt="pizza-image" width="70" >
+            <img src="pizza1.png" alt="pizza-image" width="70">
             <h2>Small Pizza</h2>
             <h3>R47.90</h3>
             <p>
-                small pizza with 3 toppings 
-                <br>
-                1 meat topping.
-                <br>
-                3 or less other toppings
+              small pizza with 3 toppings
+              <br>
+              1 meat topping.
+              <br>
+              3 or fewer other toppings
             </p>
-            <div class="" x-data="{ count:  }">
-                <div class="">
-                    <p x-text="count"></p>
-                    <button class="button-size" @click="count++"><b>Buy</b></button>
-                </div> 
+            <div x-data>
+              <button class="button-size" @click="$dispatch('addToCart', { name: 'Small Pizza', price: 47.90 })"><b>Buy</b></button>
             </div>
-            
-        </div>
-    
-        <div class="pizza medium-pizza">
-            
+          </div>
+          
+          <div class="pizza medium-pizza">
             <img src="pizza2.png" alt="pizza-image" width="110">
             <h2>Medium Pizza</h2>
             <h3>R79.90</h3>
             <p>
-                medium margeritha pizza with 3 toppings max.
-                <br>
-                2 or less mea topping.
-                <br>
-                3 or less other toppings.
+              medium margeritha pizza with 3 toppings max.
+              <br>
+              2 or fewer meat toppings.
+              <br>
+              3 or fewer other toppings.
             </p>
-            <div class="" x-data="{ count:  }">
-                <div class="">
-                    <p x-text="count"></p>
-                    <button class="button-size" @click="count++"><b>Buy</b></button>
-                </div> 
+            <div x-data>
+              <button class="button-size" @click="$dispatch('addToCart', { name: 'Medium Pizza', price: 79.90 })"><b>Buy</b></button>
             </div>
-            
-        </div>
-        
-        <div class="pizza large-pizza">
-            
-            <img src="pizza4.png" alt="pizza-image" width="140" >
+          </div>
+          
+          <div class="pizza large-pizza">
+            <img src="pizza4.png" alt="pizza-image" width="140">
             <h2>Large Pizza</h2>
             <h3>R114.90</h3>
             <p>
-                large margeritha pizza with 3 toppings max.
-                <br>
-                3 meat toppings max.
-                <br>
-                3 or less other toppings
+              large margeritha pizza with 3 toppings max.
+              <br>
+              3 meat toppings max.
+              <br>
+              3 or fewer other toppings
             </p>
-            <div class="" x-data="{ count:  }">
-                <div class="">
-                    <p x-text="count"></p>
-                    <button class="button-size" @click="count++"><b>Buy</b></button>
-                </div> 
+            <div x-data>
+              <button class="button-size" @click="$dispatch('addToCart', { name: 'Large Pizza', price: 114.90 })"><b>Buy</b></button>
             </div>
-        </div>
-
+          </div>          
     </div>
 
     <div class="pizza contact-details">
-
         <div class="pizzas">
             <div class="box">
                 <p>
@@ -142,9 +116,76 @@
         </div>
 
     </div>
-    
-    <script src="cartComponent.js"></script>
-</body>
-</html>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@2.8.2/dist/alpine.js"></script>
+    <script>
+        function cartComponent() {
+            return {
+                // Create component properties and methods
+
+                // Cart items
+                cart: [],
+
+                // Add a pizza to the cart
+                addToCart: function (name, price) {
+                    // Check if the selected pizza is already in the cart
+                    const existingPizza = this.cart.find(
+                        item => item.name === pizza.name && item.price === pizza.price);
+
+                    if (existingPizza) {
+                        existingPizza.quantity++;
+                    } else {
+                        this.cart.push({
+                            name: name,
+                            price: price,
+                            quantity: 1
+                        });
+                    }
+                },
+
+                // Remove a pizza from the cart
+                removeFromCart: function (index) {
+                    this.cart.splice(index, 1);
+                },
+
+                // Calculate the total cost of the items in the cart
+                calculateTotal: function () {
+                    if (this.cart.length === 0) {
+                        return '0.00';
+                    }
+
+                    let total = 0;
+                    for (let i = 0; i < this.cart.length; i++) {
+                        const pizza = this.cart[i];
+                        total += pizza.price * pizza.quantity;
+                    }
+                    return total.toFixed(2);
+                },
+
+                // Message to be displayed
+                message: "Thank you for choosing Perfect Pizza!",
+
+                // Payment amount (Total cost)
+                paymentAmount: function () {
+                    return this.calculateTotal();
+                },
+
+                // Checkout function
+                checkout: function () {
+                    if (this.cart.length === 0) return;
+
+                    const paymentAmount = parseFloat(this.paymentAmount());
+                    const paymentInput = prompt("Enter payment amount:");
+                    const enteredAmount = parseFloat(paymentInput);
+
+                    if (!isNaN(enteredAmount) && enteredAmount >= paymentAmount) {
+                        alert("Enjoy your pizzas!");
+                        this.cart = [];
+                    } else {
+                        alert("Sorry, that is not enough money!");
+                    }
+                },
+            };
+        };
+    </script>
 </body>
 </html>
