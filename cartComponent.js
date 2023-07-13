@@ -8,7 +8,8 @@ function cartComponent() {
 
         /**
          * Add a pizza to the cart
-         * @param {Object} pizza - The pizza object to add to the cart
+         * @param {string} name - The name of the pizza.
+         * @param {number} price - The price of the pizza.
          */
         addToCart: function (name, price) {
             // Check if the selected pizza is already in the cart

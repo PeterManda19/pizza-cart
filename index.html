@@ -15,12 +15,12 @@
         <template x-if="cart.length === 0">
             <p>Your cart is empty.</p>
         </template>
-        <template x-for="(pizza, index) in cart" :key="index">
+        <template x-for="(name, price) in cart" :key="index">
             <div>
-                <h3 class="display">{{ pizza.name }}</h3>
+                <h3 class="display">{{ name }}</h3>
                 <button @click="addToCart(pizza)" class="add-button">+</button>
                 <button @click="removeFromCart(index)" class="remove-button">-</button>
-                <span class="cost">R{{ pizza.price.toFixed(2) }}</span>
+                <span class="cost">R{{ price.toFixed(2) }}</span>
             </div>
         </template>
         
