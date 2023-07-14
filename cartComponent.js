@@ -8,21 +8,22 @@ function cartComponent() {
 
         /**
          * Add a pizza to the cart
-         * @param {string} name - The name of the pizza.
-         * @param {number} price - The price of the pizza.
+         * @param {object} pizza - The pizza object containing name and price properties.
+         * 
          */
-        addToCart: function (name, price) {
+        addToCart: function (pizza) {
             // Check if the selected pizza is already in the cart
             const existingPizza = this.cart.find(
-                item => item.name === name && item.price === price);
+                item => item.name === pizza.name && item.price === pizza.price);
 
             if (existingPizza) {
                 existingPizza.quantity++;
             } else {
                 this.cart.push({
-                    name: name,
-                    price: price,
-                    quantity: 1
+                    name: pizza.name,
+                    price: pizza.price,
+                    quantity: 1,
+                    amount: 0
                 });
             }
         },
