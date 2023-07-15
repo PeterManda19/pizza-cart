@@ -7,7 +7,7 @@
     <title>Perfect Pizza Cart</title>
     <link rel="stylesheet" href="styles.css">
 </head>
-<body x-data="cartComponent()">
+<body>
     <h1 class="h1">Perfect Pizza</h1>
 
     <div class="shopping-cart" x-data="cartComponent()">
@@ -15,47 +15,49 @@
         <template x-if="cart.length === 0">
             <p>Your cart is empty.</p>
             <div>
-                <h3 class="display">Small</h3>
-                <button @click="addToCart('Small', 0.00)" class="add-button">+</button>
-                <button @click="removeFromCart(index)" class="remove-button">-</button>
-                <span class="cost">R0.00</span>
-            </div>
-            <div>
-                <h3 class="display">Medium</h3>
-                <button @click="addToCart('Medium', 0.00)" class="add-button">+</button>
-                <button @click="removeFromCart(index)" class="remove-button">-</button>
-                <span class="cost">R0.00</span>
-            </div>
-            <div>
-                <h3 class="display">Large</h3>
-                <button @click="addToCart('Large', 0.00)" class="add-button">+</button>
-                <button @click="removeFromCart(index)" class="remove-button">-</button>
-                <span class="cost">R0.00</span>
+                <div>
+                    <h3 class="display">Small</h3>
+                    <button @click="addToCart('Small Pizza', 47.90)" class="add-button" x-show="!pizzaAdded('Small Pizza')">+</button>
+                    <button @click="removeFromCart('Small Pizza', 47.90)" class="remove-button" x-show="!pizzaAdded('Small Pizza')">-</button>
+                    <span class="cost" x-text="getCartItemCost('Small Pizza', 47.90) || 'R0.00' "></span>
+                </div>
+                <div>
+                    <h3 class="display">Medium</h3>
+                    <button @click="addToCart('Medium Pizza', 79.90)" class="add-button" x-show="!pizzaAdded('Medium Pizza')">+</button>
+                    <button @click="removeFromCart('Medium Pizza', 79.90)" class="remove-button" x-show="!pizzaAdded('Medium Pizza')">-</button>
+                    <span class="cost" x-text="getCartItemCost('Medium Pizza', 79.90) || 'R0.00'"></span>
+                </div>
+                <div>
+                    <h3 class="display">Large</h3>
+                    <button @click="addToCart('Large Pizza', 114.90)" class="add-button" x-show="!pizzaAdded('Large Pizza')">+</button>
+                    <button @click="removeFromCart('Large Pizza', 114.90)" class="remove-button" x-show="!pizzaAdded('Large Pizza')">-</button>
+                    <span class="cost" x-text="getCartItemCost('Large Pizza', 114.90) || 'R0.00'"></span>
+                </div>
             </div>
         </template>
-
-        <template x-for="(pizza) in cart" :key="index">
+    
+        <template x-for="(pizza, index) in cart" :key="index">
             <div>
-                <h3 class="display">{{ pizza.name }}</h3>
-                <button @click="addToCart(pizza)" class="add-button">+</button>
-                <button @click="removeFromCart(index)" class="remove-button">-</button>
-                <span class="cost">R{{ pizza.price.toFixed(2) }}</span>
+                <h3 class="display" x-text="pizza.name"></h3>
+                <button @click="addToCart(pizza.name, pizza.price)" class="add-button" x-show="pizzaAdded(pizza.name) && pizza.quantity > 0">+</button>
+                <button @click="removeFromCart(pizza.name, pizza.price)" class="remove-button" x-show="pizzaAdded(pizza.name)">-</button>
+                <span class="cost" x-text="getCartItemCost(pizza.name, pizza.price)"></span>
             </div>
         </template>
         
-        <h3 x-show="cart.length > 0">Total cost: R{{ calculateTotal() }}</h3>
+        <h3 x-show="cart.length > 0" x-text="'Total cost: R' + calculateTotal()"></h3>
         <p x-text="message"></p>
         <div class="payment-amount" x-show="cart.length > 0">
-            <template x-for="(pizza, index) in cart" :key="index">
-                <h3>Payment amount ({{ pizza.name }}): R{{ pizza.amount.toFixed(2) }}</h3>
-            </template>
+            <label for="paymentAmount">Payment amount:</label>
+            <input type="number" id="paymentAmount" x-model="paymentAmount" step="0.01">
         </div>
     
         <button class="button-size" @click="checkout()" x-show="cart.length > 0"><b>Pay</b></button>
-    </div>    
+    </div>
+        
 
     <div class="pizzas">
-        <div class="pizza small-pizza">
+        <div class="pizza small-pizza" >
             <img src="pizza1.png" alt="pizza-image" width="70">
             <h2>Small Pizza</h2>
             <h3>R47.90</h3>
@@ -66,12 +68,11 @@
               <br>
               3 or fewer other toppings
             </p>
-            <div x-data>
-              <button class="button-size" @click="$dispatch('addToCart', { name: 'Small Pizza', price: 47.90 })"><b>Buy</b></button>
-            </div>
-          </div>
+            <button @click="buyPizza('Small Pizza', 47.90)" class="button-size" x-show="!pizzaAdded('Small Pizza')"><b>Buy</b></button>
+            <span class="cost" x-text="getCartItemCost('Small Pizza', 47.90) || 'R0.00' "></span>
+        </div>
           
-          <div class="pizza medium-pizza">
+        <div class="pizza medium-pizza">
             <img src="pizza2.png" alt="pizza-image" width="110">
             <h2>Medium Pizza</h2>
             <h3>R79.90</h3>
@@ -82,12 +83,11 @@
               <br>
               3 or fewer other toppings.
             </p>
-            <div x-data>
-              <button class="button-size" @click="$dispatch('addToCart', { name: 'Medium Pizza', price: 79.90 })"><b>Buy</b></button>
-            </div>
-          </div>
+            <button @click="buyPizza('Medium Pizza', 79.90)" class="button-size" x-show="!pizzaAdded('Medium Pizza')"><b>Buy</b></button>
+            <span class="cost" x-text="getCartItemCost('Medium Pizza', 79.90) || 'R0.00'"></span>
+        </div>
           
-          <div class="pizza large-pizza">
+        <div class="pizza large-pizza">
             <img src="pizza4.png" alt="pizza-image" width="140">
             <h2>Large Pizza</h2>
             <h3>R114.90</h3>
@@ -98,10 +98,9 @@
               <br>
               3 or fewer other toppings
             </p>
-            <div x-data>
-              <button class="button-size" @click="$dispatch('addToCart', { name: 'Large Pizza', price: 114.90 })"><b>Buy</b></button>
-            </div>
-          </div>          
+            <button @click="buyPizza('Large Pizza', 114.90)" class="button-size" x-show="!pizzaAdded('Large Pizza')"><b>Buy</b></button>
+            <span class="cost" x-text="getCartItemCost('Large Pizza', 114.90) || 'R0.00'"></span>
+        </div>          
     </div>
 
     <div class="pizza contact-details">
@@ -133,11 +132,135 @@
                     </strong> 
                 </p>
             </div>
-
         </div>
-
     </div>
+
+    <script>
+        /**
+         * Alpine.js component for managing the shopping cart functionality
+         */
+        function cartComponent() {
+            return {
+                // Cart items
+                cart: [],
+
+                /**
+                 * Add a pizza to the cart
+                 * @param {string} name - The name of the pizza.
+                 * @param {number} price - The price of the pizza.
+                 */
+                addToCart: function (name, price) {
+                    // Check if the selected pizza is already in the cart
+                    const existingPizza = this.cart.find(
+                        item => item.name === name && item.price === price
+                    );
+
+                    if (existingPizza) {
+                        existingPizza.quantity++;
+                    } else {
+                        this.cart.push({
+                            name: name,
+                            price: price,
+                            quantity: 1,
+                            amount: price
+                        });
+                    }
+                },
+
+                /**
+                 * Buy a pizza and add it to the cart
+                 * @param {string} name - The name of the pizza.
+                 * @param {number} price - The price of the pizza.
+                 */
+                buyPizza: function (name, price) {
+                    this.addToCart(name, price);
+                    this.cartAdded = true;
+                },
+
+                /**
+                 * Check if a pizza is already added to the cart
+                 * @param {string} name - The name of the pizza.
+                 * @returns {boolean} - True if the pizza is added, false otherwise.
+                 */
+                pizzaAdded: function (name) {
+                    return this.cart.some(item => item.name === name);
+                },
+
+                /**
+                 * Remove a pizza from the cart
+                 * @param {string} name - The name of the pizza.
+                 * @param {number} price - The price of the pizza.
+                 */
+                 removeFromCart: function (name, price) {
+                    const index = this.cart.findIndex(item => item.name === name && item.price === price);
+                    if (index !== -1) {
+                        const pizza = this.cart[index];
+                        if (pizza.quantity > 1) {
+                            pizza.quantity--;
+                            pizza.amount = pizza.price * pizza.quantity;
+                        } else {
+                            this.cart.splice(index, 1);
+                        }
+                    }
+                },
+
+                /**
+                 * Calculate the total cost of the items in the cart
+                 * @returns {string} - The total cost in the format '0.00'
+                 */
+                calculateTotal: function () {
+                    if (this.cart.length === 0) {
+                        return '0.00';
+                    }
+
+                    let total = 0;
+                    for (let i = 0; i < this.cart.length; i++) {
+                        const pizza = this.cart[i];
+                        total += pizza.price * pizza.quantity;
+                    }
+                    return total.toFixed(2);
+                },
+
+                // Message to be displayed
+                message: "Thank you for choosing Perfect Pizza!",
+
+               /**
+                 * Checkout function
+                 */
+                 checkout: function () {
+                    if (this.cart.length === 0) return;
+
+                    const paymentAmount = parseFloat(this.paymentAmount);
+                    const totalCost = parseFloat(this.calculateTotal());
+
+                    console.log("Total Cost:", totalCost);
+                    console.log("Payment Amount:", paymentAmount);
+
+                    if (!isNaN(paymentAmount) && paymentAmount >= totalCost) {
+                        this.message = "Payment successful! Enjoy your pizzas!";
+                        this.cart = [];
+                    } else {
+                        this.message = "Sorry, the payment amount is not sufficient.";
+                    }
+                },
+
+
+                /**
+                 * Get the cost of a specific pizza item in the cart
+                 * @param {string} name - The name of the pizza.
+                 * @param {number} price - The price of the pizza.
+                 * @returns {string} - The cost of the pizza item in the format '0.00'
+                 */
+                getCartItemCost: function (name, price) {
+                    const pizza = this.cart.find(item => item.name === name && item.price === price);
+                    if (pizza) {
+                        return (pizza.price * pizza.quantity).toFixed(2);
+                    }
+                    return '0.00';
+                },
+            };
+        }
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@2.8.2/dist/alpine.js"></script>
-    <script src="cartComponent.js"></script>
 </body>
 </html>
