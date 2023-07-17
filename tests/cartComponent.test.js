@@ -1,46 +1,56 @@
-describe('cartComponent', function () {
-  // Test case for adding a pizza to the cart
-  it('should add a pizza to the cart', function () {
-    // Initialize the cart component
-    const component = cartComponent();
+// Test cartComponent functions
+describe('cartComponent', () => {
+  let cart;
 
-    // Call the addToCart method
-    component.addToCart('Large Pizza', 114.90);
-
-    // Check if the pizza is added to the cart
-    assert.strictEqual(component.cart.length, 1);
-    assert.deepEqual(component.cart[0], { name: 'Large Pizza', price: 114.90, quantity: 1 });
+  beforeEach(() => {
+    cart = cartComponent();
+    cart.loadCartFromLocalStorage(); // Load initial cart data
   });
 
-  // Test case for removing a pizza from the cart
-  it('should remove a pizza from the cart', function () {
-    // Initialize the cart component
-    const component = cartComponent();
-
-    // Add a pizza to the cart
-    component.addToCart('Medium Pizza', 79.90);
-
-    // Call the removeFromCart method
-    component.removeFromCart(0);
-
-    // Check if the pizza is removed from the cart
-    assert.strictEqual(component.cart.length, 0);
+  afterEach(() => {
+    localStorage.clear(); // Clear local storage after each test
   });
 
-  // Test case for calculating the total cost
-  it('should calculate the correct total cost', function () {
-    // Initialize the cart component
-    const component = cartComponent();
+  it('should add a pizza to the cart', () => {
+    cart.addToCart('Small Pizza', 47.90);
+    assert.strictEqual(cart.cart.length, 1);
+    assert.strictEqual(cart.cart[0].name, 'Small Pizza');
+    assert.strictEqual(cart.cart[0].price, 47.90);
+    assert.strictEqual(cart.cart[0].quantity, 1);
+  });
 
-    // Add pizzas to the cart
-    component.addToCart('Small Pizza', 47.90);
-    component.addToCart('Medium Pizza', 79.90);
-    component.addToCart('Large Pizza', 114.90);
+  it('should remove a pizza from the cart', () => {
+    cart.addToCart('Small Pizza', 47.90);
+    cart.addToCart('Medium Pizza', 79.90);
+    cart.removeFromCart('Small Pizza', 47.90);
+    assert.strictEqual(cart.cart.length, 1);
+    assert.strictEqual(cart.cart[0].name, 'Medium Pizza');
+    assert.strictEqual(cart.cart[0].price, 79.90);
+    assert.strictEqual(cart.cart[0].quantity, 1);
+  });
 
-    // Calculate the total cost
-    const totalCost = component.calculateTotal();
+  it('should calculate the total cost of items in the cart', () => {
+    cart.addToCart('Small Pizza', 47.90);
+    cart.addToCart('Medium Pizza', 79.90);
+    cart.addToCart('Large Pizza', 114.90);
+    assert.strictEqual(cart.calculateTotal(), '242.70');
+  });
 
-    // Check if the total cost is calculated correctly
-    assert.strictEqual(totalCost, '242.70');
+  it('should display a success message and clear the cart on successful payment', () => {
+    cart.addToCart('Small Pizza', 47.90);
+    cart.paymentAmount = 100.00;
+    cart.checkout();
+    assert.strictEqual(cart.message, 'Payment successful! Enjoy your pizzas!');
+    assert.strictEqual(cart.cart.length, 0);
+    assert.strictEqual(cart.paymentAmount, 0.00);
+  });
+
+  it('should display an error message if the payment amount is insufficient', () => {
+    cart.addToCart('Small Pizza', 47.90);
+    cart.paymentAmount = 30.00;
+    cart.checkout();
+    assert.strictEqual(cart.message, 'Sorry, the payment amount is not sufficient.');
+    assert.strictEqual(cart.cart.length, 1);
+    assert.strictEqual(cart.paymentAmount, 30.00);
   });
 });
